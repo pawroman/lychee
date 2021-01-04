@@ -68,7 +68,17 @@ fn extract_links_from_html(input: &str) -> Vec<String> {
     let mut buf = Vec::new();
     let mut urls = Vec::new();
 
-    while let Ok(e) = reader.read_event(&mut buf) {
+    loop {
+        let ev = reader.read_event(&mut buf);
+
+        let e = match ev {
+            Ok(e) => e,
+            Err(err) => {
+                dbg!(err);
+                break;
+            }
+        };
+
         match e {
             HTMLEvent::Start(ref e) | HTMLEvent::Empty(ref e) => {
                 for attr in e.attributes() {
